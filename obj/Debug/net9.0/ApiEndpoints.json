@@ -1,0 +1,28 @@
+[
+  {
+    "ContainingType": "AdditionApi.Controllers.StorageController",
+    "Method": "GetCalculations",
+    "RelativePath": "Storage/GetCalculations",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "AdditionApi.Controllers.StorageController",
+    "Method": "SaveCalculation",
+    "RelativePath": "Storage/SaveCalculation",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sqlCalculation",
+        "Type": "AdditionApi.Calculation",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
