@@ -3,7 +3,6 @@ using System.Data.SqlClient;
 
 namespace AdditionApi
 {
-
     public class SqlDatabase
     {
         private readonly string _connectionString;
@@ -11,7 +10,7 @@ namespace AdditionApi
         public SqlDatabase(IConfiguration configuration, SqlCredential sqlCredential)
         {
             var baseConn = configuration.GetConnectionString("DefaultConnection")
-                           ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection Œ¥≈‰÷√");
+                ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
 
             var builder = new SqlConnectionStringBuilder(baseConn);
 
@@ -24,7 +23,7 @@ namespace AdditionApi
             }
             else
             {
-                builder.IntegratedSecurity = true; 
+                builder.IntegratedSecurity = true;
             }
 
             _connectionString = builder.ToString();
