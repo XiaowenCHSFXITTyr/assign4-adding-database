@@ -1,4 +1,8 @@
 # assign4-adding-database
+The assignment was introduced in Class #8. In the link you can find the slides from the presentation as well as a recording of the class.
+https://classroom.google.com/c/MjI5OTg3MzMwODFa/p/MjM0NjU0MTY0MTVa/details
+
+## Instructions
 Don't start this assignment until you have finshed assignment 3!
 
 Clone this repository
