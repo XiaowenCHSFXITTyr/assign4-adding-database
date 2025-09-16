@@ -5,6 +5,9 @@ https://classroom.google.com/c/MjI5OTg3MzMwODFa/p/MjM0NjU0MTY0MTVa/details
 Class #9 contains my aggregated feedback on your first attempts at the assignment.
 https://classroom.google.com/c/MjI5OTg3MzMwODFa/p/ODA3MDA5NDI3MjE5/details
 
+This simple example shows you how to setup MS SQL server in Docker from your application code
+https://github.com/SFX-IT-Orienteringskursen-VT25/setup-mssql-with-docker-example
+
 ## Instructions
 Don't start this assignment until you have finshed assignment 3!
 
