@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
+using AdditionApi.Models;
+using System.Collections.Generic;
 
 namespace AdditionApi.Controllers
 {
@@ -7,11 +10,11 @@ namespace AdditionApi.Controllers
     [Route("[controller]")]
     public class StorageController : ControllerBase
     {
-        private readonly SqlDatabase _database;
+        private readonly IConfiguration _configuration;
 
-        public StorageController(SqlDatabase database)
+        public StorageController(IConfiguration configuration)
         {
-            _database = database;
+            _configuration = configuration;
         }
 
         [HttpPost("SaveCalculation")]
@@ -19,12 +22,12 @@ namespace AdditionApi.Controllers
         {
             try
             {
-                using var conn = new SqlConnection(_database.GetConnectionString());
+                using var conn = new SqlConnection(DatabaseHelper.GetConnectionString(_configuration));
                 conn.Open();
 
                 const string query = @"
-INSERT INTO CalculationStorage (Operand1, Operand2, Operation, Result)
-VALUES (@Operand1, @Operand2, @Operation, @Result);";
+                    INSERT INTO Calculations (Operand1, Operand2, Operation, Result)
+                    VALUES (@Operand1, @Operand2, @Operation, @Result);";
 
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Operand1", sqlCalculation.Operand1);
@@ -33,6 +36,7 @@ VALUES (@Operand1, @Operand2, @Operation, @Result);";
                 cmd.Parameters.AddWithValue("@Result", sqlCalculation.Result);
 
                 cmd.ExecuteNonQuery();
+
                 return Ok("Calculation saved successfully.");
             }
             catch (Exception ex)
@@ -46,13 +50,13 @@ VALUES (@Operand1, @Operand2, @Operation, @Result);";
         {
             try
             {
-                using var conn = new SqlConnection(_database.GetConnectionString());
+                using var conn = new SqlConnection(DatabaseHelper.GetConnectionString(_configuration));
                 conn.Open();
 
                 const string query = @"
-SELECT TOP 10 Id, Operand1, Operand2, Operation, Result
-FROM CalculationStorage
-ORDER BY Id DESC;";
+                    SELECT TOP 10 Id, Operand1, Operand2, Operation, Result
+                    FROM Calculations
+                    ORDER BY Id DESC;";
 
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = cmd.ExecuteReader();

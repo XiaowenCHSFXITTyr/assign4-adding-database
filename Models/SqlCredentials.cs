@@ -1,8 +1,7 @@
 namespace AdditionApi
 {
-    public class SqlCredential
+    public class SqlCredentials
     {
-        public string? UserId { get; set; }
-        public string? Password { get; set; }
+        public static string Password { get; } = "Password123!";
     }
 }

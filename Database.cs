@@ -1,34 +1,65 @@
-using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 
-namespace AdditionApi
+namespace AdditionApi.Models
 {
-    public class SqlDatabase
+    public static class Database
     {
-        private readonly string _connectionString;
-
-        public SqlDatabase(IConfiguration configuration, SqlCredential sqlCredential)
+        public static void CreateAndSeedDatabase(string connectionString)
         {
-            var baseConn = configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
-
-            var builder = new SqlConnectionStringBuilder(baseConn);
-
-            if (!string.IsNullOrWhiteSpace(sqlCredential?.UserId) &&
-                !string.IsNullOrWhiteSpace(sqlCredential.Password))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                builder.UserID = sqlCredential.UserId;
-                builder.Password = sqlCredential.Password;
-                builder.IntegratedSecurity = false;
-            }
-            else
-            {
-                builder.IntegratedSecurity = true;
-            }
+                connection.Open();
 
-            _connectionString = builder.ToString();
+                string createTableQuery = @"
+                    IF OBJECT_ID('Calculations', 'U') IS NULL
+                    CREATE TABLE Calculations (
+                        Id INT IDENTITY(1,1) PRIMARY KEY,
+                        Expression NVARCHAR(100),
+                        Result FLOAT
+                    )";
+
+                SqlCommand createTableCmd = new SqlCommand(createTableQuery, connection);
+                createTableCmd.ExecuteNonQuery();
+
+                string seedDataQuery = @"
+                    INSERT INTO Calculations (Expression, Result)
+                    SELECT '1 + 1', 2
+                    WHERE NOT EXISTS (SELECT 1 FROM Calculations WHERE Expression = '1 + 1');
+
+                    INSERT INTO Calculations (Expression, Result)
+                    SELECT '2 * 3', 6
+                    WHERE NOT EXISTS (SELECT 1 FROM Calculations WHERE Expression = '2 * 3');";
+
+                SqlCommand seedDataCmd = new SqlCommand(seedDataQuery, connection);
+                seedDataCmd.ExecuteNonQuery();
+            }
         }
 
-        public string GetConnectionString() => _connectionString;
+        public static List<string> GetAllCalculations(string connectionString)
+        {
+            List<string> results = new List<string>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string selectQuery = "SELECT Expression, Result FROM Calculations";
+                SqlCommand selectCmd = new SqlCommand(selectQuery, connection);
+
+                using (SqlDataReader reader = selectCmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string expression = reader["Expression"].ToString();
+                        string result = reader["Result"].ToString();
+                        results.Add($"{expression} = {result}");
+                    }
+                }
+            }
+
+            return results;
+        }
     }
 }

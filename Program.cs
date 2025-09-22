@@ -1,34 +1,36 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using AdditionApi;
-using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.Options;
+using AdditionApi.Models;
+using Microsoft.Extensions.Configuration;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// 1. MVC + Swagger
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+namespace AdditionApi
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Addition API", Version = "v1" });
-});
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var builder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            IConfiguration configuration = builder.Build();
 
-var credSection = builder.Configuration.GetSection("SqlCredential");
-builder.Services.Configure<SqlCredential>(credSection);
+            string connectionString = configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddSingleton<SqlDatabase>(sp =>
-{
-    var cfg = sp.GetRequiredService<IConfiguration>();
-    var cred = sp.GetRequiredService<IOptions<SqlCredential>>().Value ?? new SqlCredential();
-    return new SqlDatabase(cfg, cred);
-});
+            Database.CreateAndSeedDatabase(connectionString);
 
-var app = builder.Build();
+            Console.WriteLine("Reading data from the database...\n");
 
-app.UseSwagger();
-app.UseSwaggerUI();
+            List<string> results = Database.GetAllCalculations(connectionString);
 
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
+            if (results.Count == 0)
+                Console.WriteLine("No records found in the database.");
+            else
+                foreach (var result in results)
+                    Console.WriteLine(result);
 
-app.Run();
+            Console.WriteLine("\nPress any key to exit...");
+            Console.ReadKey();
+        }
+    }
+}
