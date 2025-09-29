@@ -1,18 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
+using System.Data.SqlClient;
 using AdditionApi.Models;
 
 namespace AdditionApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")] // => /api/calculation
     public class CalculationController : ControllerBase
     {
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult Get()
         {
-            var results = new List<string> { "example1", "example2" };
-            return results;
+            try
+            {
+                string connectionString = Database.GetConnectionString();
+                var calculations = Database.GetAllCalculations(connectionString); 
+                return Ok(calculations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Database error: {ex.Message}");
+            }
         }
     }
 }
