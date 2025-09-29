@@ -61,5 +61,10 @@ namespace AdditionApi.Models
 
             return results;
         }
+        public static string GetConnectionString()
+        {
+            return "Server=localhost,1433;Database=CalculationDb;User Id=sa;Password=Password123!";
+        }
+
     }
 }
